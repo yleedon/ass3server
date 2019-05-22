@@ -34,101 +34,63 @@ app.get('/select', function(req, res){
 //   res.status(201).send("yaniv")
 // });
 
+//test for our token
+app.post("/testprivate", (req, res) =>{
+    try {
+        const token = req.header("x-auth-token");
+        if(!token){
+            res.status(401).send("Access Deny, no token provided");
+        }
+
+        var ans = Account.verifyToken(token);
+        if(ans.admin)
+        res.status(200).send("helo admin user");
+        else res.status(200).send("helo user");
+
+        // res.status(ans.code).send(ans.msg);
+
+    }catch(Exeption){
+        res.status(200).send("invalid token");
+        console.log("entered exception");
+    }
+
+});
+
+
+
+
+
+
+
+
+
 
 
 // login - returns token if success
 app.post('/login', (req, res) =>{
-  Account.login(req.body['UserName'],req.body['UserPassword'])
-  .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
-  // .then(answer => res.status(answer.code).send(answer.msg))
+    Account.login(req.body['UserName'],req.body['UserPassword'])
+        .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
+        .catch(err => res.status(401).send("A REALLY unexpected error acured1"));
+});
 
-  .catch(err => res.status(401).send("A REALLY unexpected error acured1"));
+
+app.post("/register", (req, res) =>{
+    Account.register(req.body)
+    .then(answer => {res.status(answer.code).send(answer.msg); })
+    .catch(err => { res.status(err.code).send(err.msg+"end catch"); });
+
 });
 
 
 
-
-
-
-
-
-
-
-
-  // DButilsAzure.execQuery("SELECT UserPassword FROM Users WHERE UserName=\'"+req.body['UserName']+"\'")
-//   userName=req.body['UserName'];
-//   DButilsAzure.execQuery(`SELECT  UserPassword FROM Users WHERE UserName = '${userName}'`)
-//   .then((response,err) =>{
+// app.get("/api/post/:year/:month",(req,res) => {
+//     // console.log();
+//     var ans = "the year is "+req.params["year"]+", the month is "+req.params["month"];
+//     ans +="<br> the max between the two is "+calc.max(req.params["year"],req.params["month"]);
+//   res.send(ans);
 //
-//     if(response.length===0){
-//     UserNotFound(res);
-//   }
-//     if(err){
-//       res.status(401).send("An unexpected error acured");
-//     }
-//     realPass=response[0].UserPassword;
-//
-// console.log(realPass+"mmmmmm");
-//     if(!realPass){
-//       console.log(realPass+"mmmmmm");
-//     UserNotFound(res);
-//   }else if(realPass==req.body['UserPassword']){
-//       //password is correct
-//       //create and send tolke
-//       payload = {id: tokenID++, username: req.body['UserName'], admin: false};
-//       options = {expiresIn: "1d"};
-//       const token = jwt.sign(payload, secret, options);
-//       res.send(token);
-//     }else {
-//       invalidPassword(res);
-// }
-// }).catch(err => {
-//   console.log("ENTERED CATCH\n"+err);
-//   res.status(401).send("An unexpected error acured");
-// });
 // });
 
-//
-// function UserNotFound(res){
-//   res.status(401).send("user does not exist");
-//
-// }
-// function invalidPassword(res){
-//   res.status(401).send("invalid password");
-// }
-
-
-
-
-
-app.post("/private", (req, res) =>{
-  const token = req.header("x-auth-token");
-  if(!token){
-    res.status(401).send("Access Deny, no token provided");
-  }
-
-  try{
-    const decoded = jwt.verify(token, secret);
-    req.decoded = decoded;
-    if(req.decoded.admin){
-      res.status(200).send({result: 'Hello Admin'});
-    }
-    else{
-      res.status(200).send({result: 'Hello User'});
-    }
-  }
-  catch(Exception){
-    res.status(400).send("yaniv: "+ Exception);
-  }
-});
-
-app.get("/api/post/:year/:month",(req,res) => {
-    // console.log();
-    var ans = "the year is "+req.params["year"]+", the month is "+req.params["month"];
-    ans +="<br> the max between the two is "+calc.max(req.params["year"],req.params["month"]);
-  res.send(ans);
-
-});
 
 const port = process.env.PORT || 3000; //environment variable
 app.listen(port, () => {
