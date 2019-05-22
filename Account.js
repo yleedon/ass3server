@@ -6,6 +6,8 @@ var DButilsAzure = require('./DButils');
 var tokenID=0;
 app.use(express.json());
 module.exports.login = login;
+module.exports.verifyToken = verifyToken;
+module.exports.register = register;
 
 
 function login(userName,password){
@@ -30,4 +32,27 @@ console.log("entered function!");
     }
     return new Promise((resolve,reject) => resolve({ "code":400, "msg":"invalid password" }));
   })
+}
+
+
+function verifyToken(token){
+
+    if(!token){
+        return null;
+    }
+
+    try{
+        const decoded = jwt.verify(token, secret);
+        console.log("decoded="+decoded);
+        return decoded;
+    }
+    catch(Exception){
+        console.log(Exception);
+        return null;
+    }
+}
+
+
+function register(){
+
 }
