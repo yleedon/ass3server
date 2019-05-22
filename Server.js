@@ -34,21 +34,7 @@ app.get('/select', function(req, res){
 //   res.status(201).send("yaniv")
 // });
 
-
-
-// login - returns token if success
-app.post('/login', (req, res) =>{
-  Account.login(req.body['UserName'],req.body['UserPassword'])
-  .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
-  // .then(answer => res.status(answer.code).send(answer.msg))
-
-  .catch(err => res.status(401).send("A REALLY unexpected error acured1"));
-});
-
-
-
-
-
+//test for our token
 app.post("/testprivate", (req, res) =>{
     try {
         const token = req.header("x-auth-token");
@@ -77,6 +63,26 @@ app.post("/testprivate", (req, res) =>{
 
 
 
+
+
+
+// login - returns token if success
+app.post('/login', (req, res) =>{
+    Account.login(req.body['UserName'],req.body['UserPassword'])
+        .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
+        .catch(err => res.status(401).send("A REALLY unexpected error acured1"));
+});
+
+
+app.post("/register", (req, res) =>{
+    Account.register(req.body)
+    .then(answer => {res.status(answer.code).send(answer.msg); })
+    .catch(err => { res.status(err.code).send(err.msg+"end catch"); });
+
+});
+
+
+
 // app.get("/api/post/:year/:month",(req,res) => {
 //     // console.log();
 //     var ans = "the year is "+req.params["year"]+", the month is "+req.params["month"];
@@ -84,6 +90,7 @@ app.post("/testprivate", (req, res) =>{
 //   res.send(ans);
 //
 // });
+
 
 const port = process.env.PORT || 3000; //environment variable
 app.listen(port, () => {
