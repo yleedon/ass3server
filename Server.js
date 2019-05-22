@@ -76,8 +76,14 @@ app.post('/login', (req, res) =>{
 
 app.post("/register", (req, res) =>{
     Account.register(req.body)
-    .then(answer => {res.status(answer.code).send(answer.msg); })
-    .catch(err => { res.status(err.code).send(err.msg+"end catch"); });
+    .then(answer => {
+        console.log("register")
+        res.status(answer.code).send(answer.msg);
+    })
+    .catch(err => {
+        console.log("catch registration");
+        res.status(err.code).send(err.msg+"end catch");
+    });
 
 });
 
@@ -91,9 +97,59 @@ app.post("/register", (req, res) =>{
 //
 // });
 
+/**********DAN*************/
+//get Poi info
+app.get('/get_POI_info', (req, res) =>{
+    POIs.get_POI_info(req.body['poi_id'])
+        .then(ans => {
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get POI info problem:\n"+err));
+});
+
+//get POI reviews
+app.get('/get_POI_reviews', (req, res) =>{
+    POIs.get_top_POI_reviews(req.body['poi_id'], req.body['reviews_number'])
+        .then(ans => {
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get POI reviews problem:\n"+err));
+});
+
+app.get('/get_countries', (req, res) =>{
+    POIs.get_countries()
+        .then(ans =>{
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get countries problem:\n"+err));
+});
+
+app.get('/get_POIs_By_Category', (req, res) =>{
+    POIs.get_POIs_By_Category(req.body['category'])
+        .then(ans=>{
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get pois by category"));
+});
+
+app.get('/get_POIs', (req, res) =>{
+    POIs.get_POIs(req.body['min_rank'])
+        .then(ans =>{
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get pois"));
+});
+
+/**********DAN*************/
 
 const port = process.env.PORT || 3000; //environment variable
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 
 });
+
