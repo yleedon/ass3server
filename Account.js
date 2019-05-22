@@ -7,7 +7,7 @@ var tokenID=0;
 app.use(express.json());
 module.exports.login = login;
 module.exports.verifyToken = verifyToken;
-module.exports.register = register;
+module.exports.register = danreg;
 
 
 function login(userName,password){
@@ -92,7 +92,7 @@ function register(credentials){
 
 }
 
-function createQnATable(userName,qa){
+async function createQnATable(userName,qa){
     tablename = userName + "_qna";
     return DButilsAzure.execQuery(`CREATE TABLEh ${tablename}(Question NVARCHAR(255) NOT NULL UNIQUE, Answer NVARCHAR(255) NOT NULL)`)
         .then(ans => {
@@ -100,7 +100,7 @@ function createQnATable(userName,qa){
             return new Promise((resolve,reject) => resolve({ "code":200, "msg":"table has been added"}));
         })
         .catch(err => {
-            throw err;
+            return new Promise((resolve, reject) => reject({'code':400, 'msg':err}));
         });
 
 
@@ -133,6 +133,10 @@ async function danreg(credentials){
     return DButilsAzure.execQuery(`INSERT INTO  Users VALUES ('${credentials['UserName']}',
       '${credentials['UserPassword']}','${credentials['FirstName']}','${credentials['LastName']}',
       '${credentials['City']}','${credentials['Country']}','${credentials['Email']}')`)
-        .then(response => {createQnATable(credentials['UserName'], credentials['QNA'])})
-
+        .then(response => {
+            console.log("Last Then");
+            return new Promise((resolve, reject) => resolve({'code':200, 'msg':response}));
+        })
+        .catch(err => {
+            return new Promise((resolve, reject) => reject({'code':400, 'msg':err}))});
 }
