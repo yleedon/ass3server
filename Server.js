@@ -11,6 +11,20 @@ app.use('/validate', Account.token_verification);
 
 console.log("server started!");
 
+app.get('/validate/getPassword', (req, res) =>{
+    Account.getPassword(req.decoded['username'],req.body)
+        .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
+        .catch(err => res.status(401).send(err.msg));
+});
+
+app.get('/validate/getQNA', (req, res) =>{
+    console.log(req.decoded['username']);
+    Account.getUserQuestions(req.decoded['username'])
+        .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
+        .catch(err => res.status(401).send(err.msg));
+});
+
+
 //welcome screen
 app.get("/", (req, res) => {
     res.status(200).send("welcome to the main page");
