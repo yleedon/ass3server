@@ -107,7 +107,7 @@ app.get('/get_POI_info', (req, res) =>{
             console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get POI info problem:\n"+err));
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 //get POI reviews
@@ -117,7 +117,7 @@ app.get('/get_POI_reviews', (req, res) =>{
             console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get POI reviews problem:\n"+err));
+        .catch(err => res.status(400).send("get POI reviews failed"));
 });
 
 //get countries
@@ -127,7 +127,7 @@ app.get('/get_countries', (req, res) =>{
             console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get countries problem:\n"+err));
+        .catch(err => res.status(400).send("get countries failed"));
 });
 
 //get pois by category
@@ -137,7 +137,7 @@ app.get('/get_POIs_By_Category', (req, res) =>{
             console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get pois by category"));
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 //get pois
