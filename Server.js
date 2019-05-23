@@ -77,7 +77,7 @@ app.post('/login', (req, res) =>{
 app.post("/register", (req, res) =>{
     Account.register(req.body)
     .then(answer => {
-        console.log("register")
+        console.log("register1")
         res.status(answer.code).send(answer.msg);
     })
     .catch(err => {
