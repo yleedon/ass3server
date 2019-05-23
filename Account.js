@@ -8,7 +8,23 @@ app.use(express.json());
 module.exports.login = login;
 module.exports.verifyToken = verifyToken;
 module.exports.register = danreg;
+module.exports.token_verification = token_middleware;
 
+
+function token_middleware(req, res, next){
+    const token = req.header("x-auth-token");
+
+    if(!token) res.status(401).send("Access denied. No token provided");
+
+    try{
+        const decoded = jwt.verify(token, secret);
+        req.decoded = decoded;
+        next();
+    }
+    catch (exception) {
+        res.status(400).send("Invalid token");
+    }
+}
 
 function login(userName,password){
 console.log("entered function!");

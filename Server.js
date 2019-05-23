@@ -4,7 +4,9 @@ const Account = require("./Account");
 const secret = 'ILikeToMoveItMoveIt';
 var jwt = require('jsonwebtoken');
 var DButilsAzure = require('./DButils');
+const POIs = require('./POIs');
 app.use(express.json());
+app.use('/validate', Account.token_verification);
 
 
 console.log("server started!");
@@ -118,6 +120,7 @@ app.get('/get_POI_reviews', (req, res) =>{
         .catch(err => res.status(400).send("get POI reviews problem:\n"+err));
 });
 
+//get countries
 app.get('/get_countries', (req, res) =>{
     POIs.get_countries()
         .then(ans =>{
@@ -127,6 +130,7 @@ app.get('/get_countries', (req, res) =>{
         .catch(err => res.status(400).send("get countries problem:\n"+err));
 });
 
+//get pois by category
 app.get('/get_POIs_By_Category', (req, res) =>{
     POIs.get_POIs_By_Category(req.body['category'])
         .then(ans=>{
@@ -136,6 +140,7 @@ app.get('/get_POIs_By_Category', (req, res) =>{
         .catch(err => res.status(400).send("get pois by category"));
 });
 
+//get pois
 app.get('/get_POIs', (req, res) =>{
     POIs.get_POIs(req.body['min_rank'])
         .then(ans =>{
@@ -143,6 +148,16 @@ app.get('/get_POIs', (req, res) =>{
             res.status(ans.code).send(ans.msg);
         })
         .catch(err => res.status(400).send("get pois"));
+});
+
+//get favorites
+app.get('/validate/get_favorites', (req, res) => {
+    POIs.get_favorites(req.decoded['UserName'])
+        .then(ans => {
+            console.log(ans);
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(400).send("get favorites"));
 });
 
 /**********DAN*************/
