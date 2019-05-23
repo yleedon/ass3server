@@ -9,6 +9,7 @@ module.exports.get_top_POI_reviews = get_top_POI_reviews;
 module.exports.get_countries = get_countries;
 module.exports.get_POIs_By_Category = get_POIs_By_Category;
 module.exports.get_POIs = get_POIs;
+module.exports.get_favorites = get_favorites;
 
 async function get_POI_info(POI_ID){
     console.log("get poi info");
@@ -89,4 +90,19 @@ async function get_POIs(min_rating) {
             return new Promise((resolve, reject) => resolve({'code':200, 'msg':ans}));
         })
         .catch(err => {return new Promise((resolve, reject) => resolve({'code':400, 'msg':'get_POIs:\n'+err}))});
+}
+
+async function get_favorites(UserName) {
+    console.log("get favorites");
+    return DButilsAzure.execQuery(`SELECT * FROM POIs WHERE ID IN (SELECT POI_ID FROM FavoritePOIs WHERE UserName='${UserName}') `)
+        .then(response => {
+            let ans = [];
+            for (let i=0; i<response.length; i++){
+                let poi = {'views_amount':response[i].Views, 'description':response[i]._Description,
+                    'rating':response[i].Rank, 'id':response[i].ID, 'name':response[i]._Name};
+                ans.push(poi);
+            }
+            return new Promise((resolve, reject) => resolve({'code':200, 'msg':ans}));
+        })
+        .catch(err => {return new Promise((resolve, reject) => resolve({'code':400, 'msg':'get_favorites:\n'+err}))});
 }
