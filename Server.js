@@ -86,18 +86,16 @@ app.post("/testprivate", (req, res) =>{
 app.post('/login', (req, res) =>{
     Account.login(req.body['UserName'],req.body['UserPassword'])
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
-        .catch(err => res.status(401).send("A REALLY unexpected error acured1"));
+        .catch(err => res.status(401).send("A REALLY unexpected error"));
 });
 
 
 app.post("/register", (req, res) =>{
     Account.register(req.body)
     .then(answer => {
-        console.log("register1")
         res.status(answer.code).send(answer.msg);
     })
     .catch(err => {
-        console.log("catch registration");
         res.status(err.code).send(err.msg+"end catch");
     });
 
@@ -176,6 +174,14 @@ app.put('/validate/set_favorites', (req, res) => {
         })
         .catch(err => res.status(err.code).send(err.msg));
 });
+
+app.post('/validate/post_review', (req, res) => {
+    POIs.post_review(req.decoded['username'], req.body['poi_id'], req.body['review'])
+        .then(ans =>{
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(err.code).send(err.msg));
+})
 
 /**********DAN*************/
 
