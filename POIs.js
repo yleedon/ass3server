@@ -11,6 +11,7 @@ module.exports.get_POIs_By_Category = get_POIs_By_Category;
 module.exports.get_POIs = get_POIs;
 module.exports.get_favorites = get_favorites;
 module.exports.set_favorites = set_favorites;
+module.exports.post_review = add_review_to_POI;
 
 function get_POI_info(POI_ID) {
     return DButilsAzure.execQuery(`SELECT * FROM POIs WHERE ID='${POI_ID}'`)
@@ -148,7 +149,6 @@ function get_favorites(UserName) {
 }
 
 function set_favorites(UserName, favorites) {
-    console.log("set favorites");
     return new Promise((resolve, reject) => {
         try{
             DButilsAzure.execQuery(`DELETE FROM FavoritePOIs WHERE UserName='${UserName}'`)
@@ -164,6 +164,27 @@ function set_favorites(UserName, favorites) {
                         })
                         .catch(err => reject({'code':400, 'msg':err.message}))
                 })
+                .catch(err => reject({'code':400, 'msg':err.message}))
+        }catch (e) {
+            reject({'code':400, 'msg':e});
+        }
+    })
+}
+
+function add_review_to_POI(UserName, POI_ID, review){
+    return new Promise((resolve, reject) => {
+        try{
+            if (!POI_ID){
+                reject({'code':400, 'msg':'Must have poi_id'})
+            }
+            if (!review || !review.rating){
+                reject({'code':400, 'msg':'Must have rating'});
+            }
+            if (!review.content){
+                review.content = '';
+            }
+            DButilsAzure.execQuery(`INSERT INTO Reviews VALUES('${POI_ID}', '${UserName}', '${review.content}', ${review.rating}, GETDATE())`)
+                .then(response => resolve({'code':201, 'msg':'review has been added'}))
                 .catch(err => reject({'code':400, 'msg':err.message}))
         }catch (e) {
             reject({'code':400, 'msg':e});
