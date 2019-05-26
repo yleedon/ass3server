@@ -118,7 +118,6 @@ app.post("/register", (req, res) =>{
 app.get('/get_POI_info', (req, res) =>{
     POIs.get_POI_info(req.body['poi_id'])
         .then(ans => {
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
         .catch(err => res.status(err.code).send(err.msg));
@@ -128,27 +127,24 @@ app.get('/get_POI_info', (req, res) =>{
 app.get('/get_POI_reviews', (req, res) =>{
     POIs.get_top_POI_reviews(req.body['poi_id'], req.body['reviews_number'])
         .then(ans => {
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get POI reviews failed"));
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 //get countries
 app.get('/get_countries', (req, res) =>{
     POIs.get_countries()
         .then(ans =>{
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get countries failed"));
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 //get pois by category
 app.get('/get_POIs_By_Category', (req, res) =>{
     POIs.get_POIs_By_Category(req.body['category'])
         .then(ans=>{
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
         .catch(err => res.status(err.code).send(err.msg));
@@ -156,22 +152,29 @@ app.get('/get_POIs_By_Category', (req, res) =>{
 
 //get pois
 app.get('/get_POIs', (req, res) =>{
-    POIs.get_POIs(req.body['min_rank'])
+    POIs.get_POIs(req.body['min_rating'])
         .then(ans =>{
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get pois"));
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 //get favorites
 app.get('/validate/get_favorites', (req, res) => {
-    POIs.get_favorites(req.decoded['UserName'])
+    POIs.get_favorites(req.decoded['username'])
         .then(ans => {
-            console.log(ans);
             res.status(ans.code).send(ans.msg);
         })
-        .catch(err => res.status(400).send("get favorites"));
+        .catch(err => res.status(err.code).send(err.msg));
+});
+
+//set favorites
+app.put('/validate/set_favorites', (req, res) => {
+    POIs.set_favorites(req.decoded['username'], req.body['favorites'])
+        .then(ans =>{
+            res.status(ans.code).send(ans.msg);
+        })
+        .catch(err => res.status(err.code).send(err.msg));
 });
 
 /**********DAN*************/
