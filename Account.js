@@ -10,7 +10,7 @@ module.exports.verifyToken = verifyToken;
 module.exports.register = testreg;
 module.exports.token_verification = token_middleware;
 module.exports.getUserQuestions = getUserQuestions;
-module.exports.getPassword=getPassword;
+module.exports.getPassword = getPassword;
 
 
 function token_middleware(req, res, next) {
@@ -74,10 +74,10 @@ function validateReg(credentials) {
         return false;
     try {
         if (!credentials['UserName'] || !credentials['UserPassword'] || !credentials['FirstName'] || !credentials['LastName'] ||
-            !credentials['City'] || !credentials['Country'] || !credentials['Email'] || !credentials['Q&A'] || !credentials['Catagories'])
+            !credentials['City'] || !credentials['Country'] || !credentials['Email'] || !credentials['Q&A'] || !credentials['Categories'])
             return false;
 
-        if (credentials['Q&A'].length < 2 || credentials['Catagories'].length < 2)
+        if (credentials['Q&A'].length < 2 || credentials['Categories'].length < 2)
             return false;
 
 
@@ -96,104 +96,127 @@ function addQnA(qnA, userName) {
 
         try {
 
+            let query = "INSERT INTO QNA VALUES";
             qnA.forEach(function (atribute) {
                 try {
-                    DButilsAzure.execQuery(`INSERT INTO QNA VALUES ('${atribute.q}', '${atribute.a}', '${userName}')`)
-                        .then((data) => {
-                            console.log("added to q&a: Q:" + atribute.q + ", A:" + atribute.a + ", user:" + userName);
-                            resolve("yey");
-                        })
-                        .catch((err) => {
-                            console.log("yaniv 4");
-                            reject(err);
-                        });
-
-
-                } catch (e) {
-                    reject(e);
+                    if(!atribute.q || !atribute.a)
+                        throw("bad arguments! mast have q:question, a:answer");
+                    query = query + "('" + atribute.q + "', '" + atribute.a + "', '" + userName + "'),";
+                    console.log("added to q&a: Q:" + atribute.q + ", A:" + atribute.a + ", user:" + userName);
+                }catch(e){
+                    throw(e);
                 }
             });
 
+            query = query.substring(0, query.length - 1);
 
-        } catch (e) {
-            reject(e);
-        }
+            DButilsAzure.execQuery(`${query}`)
+                .then(respons => {
 
-    })
-}
-
-
-function regAddCategories(cat, userName) {
-    return new Promise((resolve, rejectww) => {
-
-
-        try {
-
-
-            cat.forEach(function (atribute) {
-                try {
-                    console.log("************" + atribute);
-                    DButilsAzure.execQuery(`INSERT INTO CategoriesByUsers VALUES ('${atribute}', '${userName}')`)
-                        .then((data) => {
-                            console.log("added to CategoriesByUser: cat:" + atribute + ", user:" + userName);
-                            resolve("added categories");
-                        })
-                        .catch((err) => {
-                            console.log("yaniv 6");
-
-                            throw "data base error:\n" + err
-                        });
-
-                } catch (e) {
-                    rejectww(e);
-                }
-            });
-
-        } catch (Exception) {
-            console.log("yaniv3");
-            rejectww("ERROR2: did not add to CategoriesByUser")
-        }
-
-    })
-
-}
-
-
-function testreg(credentials) {
-    return new Promise((resolve, reject) => {
-            try {
-
-                if (!validateReg(credentials)) {
-                    reject({'code': 400, 'msg': err});
-                }
-
-                DButilsAzure.execQuery(`INSERT INTO  Users VALUES ('${credentials['UserName']}',
-                    '${credentials['UserPassword']}','${credentials['FirstName']}','${credentials['LastName']}',
-                    '${credentials['City']}','${credentials['Country']}','${credentials['Email']}')`)
-                    .then(response => {
-                            console.log("added user");
-                            addQnA(credentials['Q&A'], credentials['UserName'])
-                                .then(regAddCategories(credentials['Catagories'], credentials['UserName']))
-                                .then(ans => {
-                                    console.log("yaniv55");
-                                    resolve({'code': 200, 'msg': "user was created"})
-                                }).catch(err => {
-                                console.log("should be fail add category");
-                                reject(err)
-                            })
-                        }
-                    ).catch(err => {
-                    console.log("yaniv999");
-                    reject({'code': 400, 'msg': err});
+                    resolve({'code': 201, 'msg': "QNA has been added"});
+                })
+                .catch(err => {
+                    reject({ "code":400 , "msg":err.message})
                 })
 
 
-            } catch
-                (e) {
-                reject({'code': 400, 'msg': "Exceptionerrpr:\n" + e});
-            }
+        } catch (e) {
+            reject({ "code":400 , "msg":e})
         }
-    )
+    })}
+
+
+
+
+//             qnA.forEach(function (atribute) {
+//                 try {
+//                     DButilsAzure.execQuery(`INSERT INTO QNA VALUES ('${atribute.q}', '${atribute.a}', '${userName}')`)
+//                         .then((data) => {
+//                             console.log("added to q&a: Q:" + atribute.q + ", A:" + atribute.a + ", user:" + userName);
+//                             resolve("yey");
+//                         })
+//                         .catch((err) => {
+//                             console.log("yaniv 4");
+//                             reject(err);
+//                         });
+//
+//
+//                 } catch (e) {
+//                     reject(e);
+//                 }
+//             });
+//
+//
+//         } catch (e) {
+//             reject(e);
+//         }
+//
+//     })
+// }
+
+
+function regAddCategories(cat, userName) {
+    return new Promise((resolve, reject) => {
+        // reject({'code':201, 'msg':'category failure'});
+
+
+            try {
+                let query = "INSERT INTO CategoriesByUsers VALUES";
+                cat.forEach(function (atribute) {
+                    query = query + "('" + atribute + "', '"+ userName +"'),"
+                });
+                query = query.substring(0, query.length - 1);
+                DButilsAzure.execQuery(`${query}`)
+                    .then(response => {
+                        resolve({'code': 201, 'msg': 'Categories has been added'});
+                    })
+                    .catch(err => {
+                        reject({'code': 400, 'msg': err.message})
+                    });
+
+            }catch(e){
+                reject({'code': 400, 'msg': e})
+            }
+    })}
+
+
+
+function testreg(credentials) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!validateReg(credentials)) {
+               throw("bas credentials given");
+            }
+            let newUserCreated = false;
+            await DButilsAzure.execQuery(`INSERT INTO  Users VALUES ('${credentials['UserName']}',
+                    '${credentials['UserPassword']}','${credentials['FirstName']}','${credentials['LastName']}',
+                    '${credentials['City']}','${credentials['Country']}','${credentials['Email']}')`)
+                .then(async response => {
+                    newUserCreated = true;
+                    await addQnA(credentials['Q&A'], credentials['UserName'])
+                        .then(async response => {
+                            await regAddCategories(credentials['Categories'], credentials['UserName'])
+                                .then(response => {
+                                    resolve({'code': 201, 'msg': 'user was added'});
+                                })
+                                .catch(async err =>{
+                                    await DButilsAzure.execQuery(`DELETE FROM Users WHERE UserName='${credentials['UserName']}'`);
+                                    reject({'code': err.code, 'msg': err.msg})}
+                                )
+                        })
+                        .catch(async err => {
+                            await DButilsAzure.execQuery(`DELETE FROM Users WHERE UserName='${credentials['UserName']}'`);
+                            reject({'code': err.code, 'msg': err.msg})})
+                }).catch(async err => {
+                    console.log("qwqwqwqwwwqwqwqwqwqwqwqwqw")
+
+                    reject({'code':400, 'msg':err.message});
+                });
+        } catch (e) {
+            reject({'code':400, 'msg': e})
+        }
+    });
+
 }
 
 function getUserQuestions(userName) {
@@ -216,32 +239,39 @@ function getUserQuestions(userName) {
     })
 }
 
-function getPassword(userName,qna) {
+function getPassword(userName, qna) {
     return new Promise((resolve, reject) => {
         try {
-            if(!qna || !qna.Q || !qna.A)
+            if (!qna || !qna.Q || !qna.A)
                 reject({'code': 400, 'msg': "bad credentials"});
 
             DButilsAzure.execQuery(`SELECT Answer FROM QNA Where UserName='${userName}' AND Question='${qna.Q}' `)
                 .then(realAnswer => {
-                    if(!realAnswer || realAnswer.length ==0){
-                        reject({'code': 400, 'msg': "ERROR3 getPassword:\nno answer was founs for your question and username"})
+                        if (!realAnswer || realAnswer.length == 0) {
+                            reject({
+                                'code': 400,
+                                'msg': "ERROR3 getPassword:\nno answer was founs for your question and username"
+                            })
+                        }
+
+                        if (realAnswer[0].Answer === qna.A) {
+                            console.log("return from DB: " + realAnswer[0].Answer + "=" + qna.A)
+                            DButilsAzure.execQuery(`SELECT UserPassword FROM Users Where UserName='${userName}' `)
+                                .then(password => {
+                                    resolve({'code': 200, 'msg': password[0]})
+                                }).catch(err => {
+                                reject({'code': 400, 'msg': "ERROR1 getPassword(while retrieving password):\n" + err})
+                            })
+                        } else {
+                            reject({'code': 400, 'msg': "ERROR1 getPassword:\nthe answer did not match the real answer"})
+                        }
+
+
                     }
-
-                    if(realAnswer[0].Answer === qna.A){
-                        console.log("return from DB: "+ realAnswer[0].Answer+"="+qna.A)
-                        DButilsAzure.execQuery(`SELECT UserPassword FROM Users Where UserName='${userName}' `)
-                            .then(password => {
-                                resolve({'code': 200, 'msg':password[0]})
-                            }).catch(err => {reject({'code': 400, 'msg': "ERROR1 getPassword(while retrieving password):\n"+err})})
-                    }
-                    else{ reject({'code': 400, 'msg': "ERROR1 getPassword:\nthe answer did not match the real answer"})}
-
-
-                    }
-
                 )
-                .catch(err => { reject({'code': 400, 'msg': "ERROR1 getPassword:\n" + err})  })
+                .catch(err => {
+                    reject({'code': 400, 'msg': "ERROR1 getPassword:\n" + err})
+                })
 
 
         } catch (e) {
