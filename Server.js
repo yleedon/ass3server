@@ -97,7 +97,7 @@ app.post("/register", (req, res) =>{
         res.status(answer.code).send(answer.msg);
     })
     .catch(err => {
-        res.status(err.code).send(err.msg+"end catch");
+        res.status(err.code).send(err.msg);
     });
 
 });
