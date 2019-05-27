@@ -154,8 +154,10 @@ function set_favorites(UserName, favorites) {
             DButilsAzure.execQuery(`DELETE FROM FavoritePOIs WHERE UserName='${UserName}'`)
                 .then(response => {
                     let query = "INSERT INTO FavoritePOIs VALUES";
+                    let idx=0;
                     favorites.forEach(poi => {
-                        query += ("('"+poi+"', '"+UserName+"'),");
+                        query += ( "('" + poi + "', '" + UserName + "', " + idx + "),");
+                        idx += 1;
                     });
                     query = query.substring(0, query.length-1);
                     DButilsAzure.execQuery(`${query}`)
