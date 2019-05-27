@@ -9,9 +9,10 @@ app.use(express.json());
 app.use('/validate', Account.token_verification);
 
 
+
 console.log("server started!");
 
-app.get('/validate/getPassword', (req, res) =>{
+app.post('/validate/getPassword', (req, res) =>{
     Account.getPassword(req.decoded['username'],req.body)
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));

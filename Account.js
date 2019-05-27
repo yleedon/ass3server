@@ -222,9 +222,6 @@ function getPassword(userName,qna) {
             if(!qna || !qna.Q || !qna.A)
                 reject({'code': 400, 'msg': "bad credentials"});
 
-
-
-
             DButilsAzure.execQuery(`SELECT Answer FROM QNA Where UserName='${userName}' AND Question='${qna.Q}' `)
                 .then(realAnswer => {
                     if(!realAnswer || realAnswer.length ==0){
