@@ -10,7 +10,7 @@ app.use('/validate', Account.token_verification);
 
 
 
-console.log("server started!");
+console.log("server startedd!");
 
 app.post('/validate/getPassword', (req, res) =>{
     Account.getPassword(req.decoded['username'],req.body)
