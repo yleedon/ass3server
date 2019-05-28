@@ -7,7 +7,7 @@ var tokenID = 0;
 app.use(express.json());
 module.exports.login = login;
 module.exports.verifyToken = verifyToken;
-module.exports.register = register();
+module.exports.register = register;
 module.exports.token_verification = token_middleware;
 module.exports.getUserQuestions = getUserQuestions;
 module.exports.getPassword = getPassword;
