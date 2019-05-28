@@ -8,19 +8,22 @@ const POIs = require('./POIs');
 app.use(express.json());
 app.use('/validate', Account.token_verification);
 
-
-
 console.log("server startedd!");
 
-app.post('/validate/getPassword', (req, res) =>{
-    Account.getPassword(req.decoded['username'],req.body)
+
+/**********YANIV*************/
+
+//get password - given a correct user, question and answer, returns the users pasword
+app.post('/getPassword', (req, res) =>{
+    Account.getPassword(req.body['username'],req.body['QNA'])
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));
 });
 
-app.get('/validate/getQNA', (req, res) =>{
-    console.log(req.decoded['username']);
-    Account.getUserQuestions(req.decoded['username'])
+// get QNA - given a correct user name, will return all of his verification questions.
+app.get('/getQNA', (req, res) =>{
+    console.log(req.body['username']);
+    Account.getUserQuestions(req.body['username'])
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));
 });
@@ -44,12 +47,6 @@ app.get('/select', function(req, res){
     })
 });
 
-// app.post('/ddd/yyy', (req, res) =>{
-//   DButilsAzure.execQuery("INSERT INTO Test (UserName, UserDescription) VALUES('ddd', 'HIHIHI')")
-//   .then(d => console.log("WEEEEE"))
-//   .catch(e => console.log(e));
-//   res.status(201).send("yaniv")
-// });
 
 //test for our token
 app.post("/testprivate", (req, res) =>{
@@ -71,15 +68,7 @@ app.post("/testprivate", (req, res) =>{
         console.log("entered exception");
     }
 
-});
-
-
-
-
-
-
-
-
+});//////////////////////////////////// what is this?
 
 
 
@@ -90,7 +79,7 @@ app.post('/login', (req, res) =>{
         .catch(err => res.status(401).send("A REALLY unexpected error"));
 });
 
-
+// register
 app.post("/register", (req, res) =>{
     Account.register(req.body)
     .then(answer => {
@@ -104,13 +93,8 @@ app.post("/register", (req, res) =>{
 
 
 
-// app.get("/api/post/:year/:month",(req,res) => {
-//     // console.log();
-//     var ans = "the year is "+req.params["year"]+", the month is "+req.params["month"];
-//     ans +="<br> the max between the two is "+calc.max(req.params["year"],req.params["month"]);
-//   res.send(ans);
-//
-// });
+/**********YANIV*************/
+
 
 /**********DAN*************/
 //get Poi info
