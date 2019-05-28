@@ -7,7 +7,7 @@ var tokenID = 0;
 app.use(express.json());
 module.exports.login = login;
 module.exports.verifyToken = verifyToken;
-module.exports.register = testreg;
+module.exports.register = register();
 module.exports.token_verification = token_middleware;
 module.exports.getUserQuestions = getUserQuestions;
 module.exports.getPassword = getPassword;
@@ -51,7 +51,6 @@ function login(userName, password) {
         })
 }
 
-
 function verifyToken(token) {
 
     if (!token) {
@@ -67,7 +66,6 @@ function verifyToken(token) {
         return null;
     }
 }
-
 
 function validateReg(credentials) {
     if (!credentials)
@@ -88,7 +86,6 @@ function validateReg(credentials) {
         return false;
     }
 }
-
 
 function addQnA(qnA, userName) {
 
@@ -125,36 +122,6 @@ function addQnA(qnA, userName) {
         }
     })}
 
-
-
-
-//             qnA.forEach(function (atribute) {
-//                 try {
-//                     DButilsAzure.execQuery(`INSERT INTO QNA VALUES ('${atribute.q}', '${atribute.a}', '${userName}')`)
-//                         .then((data) => {
-//                             console.log("added to q&a: Q:" + atribute.q + ", A:" + atribute.a + ", user:" + userName);
-//                             resolve("yey");
-//                         })
-//                         .catch((err) => {
-//                             console.log("yaniv 4");
-//                             reject(err);
-//                         });
-//
-//
-//                 } catch (e) {
-//                     reject(e);
-//                 }
-//             });
-//
-//
-//         } catch (e) {
-//             reject(e);
-//         }
-//
-//     })
-// }
-
-
 function regAddCategories(cat, userName) {
     return new Promise((resolve, reject) => {
         // reject({'code':201, 'msg':'category failure'});
@@ -179,9 +146,7 @@ function regAddCategories(cat, userName) {
             }
     })}
 
-
-
-function testreg(credentials) {
+function register(credentials) {
     return new Promise(async (resolve, reject) => {
         try {
             if (!validateReg(credentials)) {
