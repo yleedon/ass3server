@@ -12,15 +12,15 @@ app.use('/validate', Account.token_verification);
 
 console.log("server startedd!");
 
-app.post('/validate/getPassword', (req, res) =>{
-    Account.getPassword(req.decoded['username'],req.body)
+app.post('/getPassword', (req, res) =>{
+    Account.getPassword(req.body['username'],req.body['QNA'])
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));
 });
 
-app.get('/validate/getQNA', (req, res) =>{
-    console.log(req.decoded['username']);
-    Account.getUserQuestions(req.decoded['username'])
+app.get('/getQNA', (req, res) =>{
+    console.log(req.body['username']);
+    Account.getUserQuestions(req.body['username'])
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));
 });
