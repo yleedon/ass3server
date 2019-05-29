@@ -8,10 +8,8 @@ const POIs = require('./POIs');
 app.use(express.json());
 app.use('/validate', Account.token_verification);
 
-console.log("server startedd!");
+// console.log("server startedd!");
 
-
-/**********YANIV*************/
 
 //get password - given a correct user, question and answer, returns the users pasword
 app.post('/getPassword', (req, res) =>{
@@ -27,50 +25,6 @@ app.get('/getQNA', (req, res) =>{
         .then(answer => {console.log(answer); res.status(answer.code).send(answer.msg); })
         .catch(err => res.status(401).send(err.msg));
 });
-
-
-//welcome screen
-app.get("/", (req, res) => {
-    res.status(200).send("welcome to the main page");
-    console.log("GET Request Requested!");
-});
-
-//get all users
-app.get('/select', function(req, res){
-    DButilsAzure.execQuery("SELECT * FROM Users")
-    .then(function(result){
-        res.send(result)
-    })
-    .catch(function(err){
-        console.log(err)
-        res.send(err)
-    })
-});
-
-
-//test for our token
-app.post("/testprivate", (req, res) =>{
-    try {
-        const token = req.header("x-auth-token");
-        if(!token){
-            res.status(401).send("Access Deny, no token provided");
-        }
-
-        var ans = Account.verifyToken(token);
-        if(ans.admin)
-        res.status(200).send("helo admin user");
-        else res.status(200).send("helo user");
-
-        // res.status(ans.code).send(ans.msg);
-
-    }catch(Exeption){
-        res.status(200).send("invalid token");
-        console.log("entered exception");
-    }
-
-});//////////////////////////////////// what is this?
-
-
 
 // login - returns token if success
 app.post('/login', (req, res) =>{
@@ -91,12 +45,6 @@ app.post("/register", (req, res) =>{
 
 });
 
-
-
-/**********YANIV*************/
-
-
-/**********DAN*************/
 //get Poi info
 app.get('/get_POI_info', (req, res) =>{
     POIs.get_POI_info(req.body['poi_id'])
@@ -104,6 +52,14 @@ app.get('/get_POI_info', (req, res) =>{
             res.status(ans.code).send(ans.msg);
         })
         .catch(err => res.status(err.code).send(err.msg));
+});
+
+app.put('/add_view_to_POI', (req, res) =>{
+    POIs.add_view_to_POI(req.body['poi_id'])
+        .then(ans =>{
+            res.status(ans.code).send(ans.msg)
+        })
+        .catch(err => res.status(err.code).send(edd.msg));
 });
 
 //get POI reviews
@@ -134,7 +90,7 @@ app.get('/get_POIs_By_Category', (req, res) =>{
 });
 
 //get pois
-app.get('/get_POIs', (req, res) =>{
+    app.get('/get_POIs', (req, res) =>{
     POIs.get_POIs(req.body['min_rating'])
         .then(ans =>{
             res.status(ans.code).send(ans.msg);
@@ -175,8 +131,6 @@ app.get('/validate/get_user_categories', (req, res) => {
         })
         .catch(err => res.status(err.code).send(err.msg))
 });
-
-/**********DAN*************/
 
 const port = process.env.PORT || 3000; //environment variable
 app.listen(port, () => {
