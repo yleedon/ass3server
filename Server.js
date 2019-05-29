@@ -166,7 +166,15 @@ app.post('/validate/post_review', (req, res) => {
             res.status(ans.code).send(ans.msg);
         })
         .catch(err => res.status(err.code).send(err.msg));
-})
+});
+
+app.get('/validate/get_user_categories', (req, res) => {
+    POIs.get_user_categories(req.decoded['username'])
+        .then(ans => {
+            res.status(ans.code).send(ans.msg)
+        })
+        .catch(err => res.status(err.code).send(err.msg))
+});
 
 /**********DAN*************/
 
