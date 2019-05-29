@@ -13,6 +13,7 @@ module.exports.get_favorites = get_favorites;
 module.exports.set_favorites = set_favorites;
 module.exports.post_review = add_review_to_POI;
 module.exports.get_user_categories = get_user_categories;
+module.exports.add_view_to_POI = add_view_to_POI;
 
 function get_POI_info(POI_ID) {
     return DButilsAzure.execQuery(`SELECT * FROM POIs WHERE ID='${POI_ID}'`)
@@ -33,6 +34,18 @@ function get_POI_info(POI_ID) {
         ).catch(err => {
             return new Promise((resolve, reject) => reject({'code': 400, 'msg': err}))
         });
+}
+
+function add_view_to_POI(POI_ID){
+    return new Promise((resolve, reject) => {
+        try{
+            DButilsAzure.execQuery(`UPDATE POIs SET Views = Views+1 WHERE ID='${POI_ID}'`)
+                .then(response => resolve({'code':200, 'msg':'updated views'}))
+                .catch(err => reject({'code':400, 'msg':err.message}))
+        }catch (e) {
+            reject({'code':400, 'msg':e})
+        }
+    });
 }
 
 function get_top_POI_reviews(POI_ID, reviews_number) {
