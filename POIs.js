@@ -12,6 +12,7 @@ module.exports.get_POIs = get_POIs;
 module.exports.get_favorites = get_favorites;
 module.exports.set_favorites = set_favorites;
 module.exports.post_review = add_review_to_POI;
+module.exports.get_user_categories = get_user_categories;
 
 function get_POI_info(POI_ID) {
     return DButilsAzure.execQuery(`SELECT * FROM POIs WHERE ID='${POI_ID}'`)
@@ -46,7 +47,7 @@ function get_top_POI_reviews(POI_ID, reviews_number) {
                 for (let i = 0; i < reviews_number; i++) {
                     let rev = {
                         'ID': response[i].ID, 'POI_ID': response[i].POI_ID, 'UserName': response[i].UserName,
-                        'Content': response[i].CONTENT, 'Raiting': response[i].Raiting, 'Date': response[i]._Date
+                        'Content': response[i].CONTENT, 'Rating': response[i].Rating, 'Date': response[i]._Date
                     };
                     ans.push(rev);
                 }
@@ -128,7 +129,7 @@ function get_POIs(min_rating) {
 }
 
 function get_favorites(UserName) {
-    return DButilsAzure.execQuery(`SELECT * FROM POIs WHERE ID IN (SELECT POI_ID FROM FavoritePOIs WHERE UserName='${UserName}')`)
+    return DButilsAzure.execQuery(`SELECT ID, _Name, _Description, Rank, Views, Idx FROM POIs INNER JOIN FavoritePOIs ON ID=POI_ID WHERE FavoritePOIs.UserName='${UserName}' ORDER BY Idx`)
         .then(response => {
             try {
                 let ans = [];
@@ -162,7 +163,7 @@ function set_favorites(UserName, favorites) {
                     query = query.substring(0, query.length-1);
                     DButilsAzure.execQuery(`${query}`)
                         .then(response => {
-                            resolve({'code':200, 'msg':'Favorite POIs set Successfully'});
+                            resolve({'code':200, 'msg':favorites.length});
                         })
                         .catch(err => reject({'code':400, 'msg':err.message}))
                 })
@@ -190,6 +191,24 @@ function add_review_to_POI(UserName, POI_ID, review){
                 .catch(err => reject({'code':400, 'msg':err.message}))
         }catch (e) {
             reject({'code':400, 'msg':e});
+        }
+    })
+}
+
+function get_user_categories(UserName){
+    return new Promise((resolve, reject) => {
+        try{
+            DButilsAzure.execQuery(`SELECT Category FROM CategoriesByUsers WHERE UserName='${UserName}'`)
+                .then(response =>{
+                    let ans = []
+                    for(let i=0; i<response.length; i++){
+                        ans.push(response[i].Category)
+                    }
+                    resolve({'code':200, 'msg':ans})
+                })
+                .catch(err => reject({'code':400, 'msg':err.message}))
+        }catch (e) {
+            reject({'code':400, 'msg':e})
         }
     })
 }
